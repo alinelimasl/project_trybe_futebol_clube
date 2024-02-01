@@ -12,6 +12,7 @@ class App {
     this.app.use(express.json());
 
     this.config();
+
     this.routes();
 
     // Não remover essa rota
