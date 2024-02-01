@@ -1,6 +1,6 @@
 import * as sinon from 'sinon';
 import * as chai from 'chai';
-
+import SequelizeUsers from '../database/models/users/SequelizeUsers';
 // @ts-ignore
 import chaiHttp = require('chai-http');
 

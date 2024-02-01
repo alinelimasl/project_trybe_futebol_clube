@@ -1,4 +1,4 @@
-import TeamsModel from '../database/models/TeamsModel';
+import TeamsModel from '../database/models/teams/TeamsModel';
 import { ITeams } from '../Interfaces/ITeams';
 import { ITeamsModel } from '../Interfaces/ITeamsModel';
 import { ServiceResponse } from '../Interfaces/ServiceResponse';
