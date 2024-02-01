@@ -1,4 +1,3 @@
-// import { NewEntity } from '../Interfaces/index';
 import TeamsModel from '../database/models/TeamsModel';
 import { ITeams } from '../Interfaces/ITeams';
 import { ITeamsModel } from '../Interfaces/ITeamsModel';
@@ -14,8 +13,8 @@ export default class TeamsService {
     return { status: 'SUCCESSFUL', data: teams };
   }
 
-  public async findById(id: number): Promise<ServiceResponse<ITeams | null>> {
-    const team = await this.teamsModel.findById(id);
+  public async getById(id: number): Promise<ServiceResponse<ITeams | null>> {
+    const team = await this.teamsModel.getById(id);
     if (!team) {
       return { status: 'NOT_FOUND', data: { message: 'Team not found' } };
     }

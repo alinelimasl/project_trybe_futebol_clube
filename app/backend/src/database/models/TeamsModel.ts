@@ -6,8 +6,8 @@ export default class TeamsModel implements ITeamsModel {
   private model = SequelizeTeams;
 
   async findAll(): Promise<ITeams[]> {
-    const find = await this.model.findAll();
-    return find.map(({ id, teamName }: ITeams) => ({ id, teamName }));
+    const getAll = await this.model.findAll();
+    return getAll.map(({ id, teamName }) => ({ id, teamName }));
   }
 
   async getById(id: ITeams['id']): Promise<ITeams | null> {

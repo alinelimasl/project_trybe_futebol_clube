@@ -7,19 +7,19 @@ export default class TeamsController {
     private teamsService: TeamsService = new TeamsService(),
   ) { }
 
-  public async findAll(req: Request, res: Response) {
-    const { status, data } = await this.teamsService.findAll();
-    return res.status(mapStatusHTTP(status)).json(data);
+  public async findAll(_req: Request, res: Response) {
+    const ServiceResponse = await this.teamsService.findAll();
+    return res.status(200).json(ServiceResponse.data);
   }
 
   public async getById(req: Request, res: Response) {
     const { id } = req.params;
-    const { status, data } = await this.teamsService.findById(Number(id));
-    res.status(mapStatusHTTP(status)).json(data);
+    const serviceResponse = await this.teamsService.getById(Number(id));
 
-    // public async create(req: Request, res: Response) {
-    //   const serviceResponse = await this.teamsService.create(req.body);
-    //   return res.status(201).json(serviceResponse.data);
-    // }
+    if (serviceResponse.status !== 'SUCCESSFUL') {
+      return res.status(mapStatusHTTP(serviceResponse.status)).json(serviceResponse.data);
+    }
+
+    res.status(200).json(serviceResponse.data);
   }
 }
