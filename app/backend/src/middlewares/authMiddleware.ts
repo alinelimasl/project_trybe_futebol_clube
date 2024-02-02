@@ -28,7 +28,7 @@ export default class Validations {
     const [type, token] = authHeader.split(' ');
 
     if (!token || type !== 'Bearer') {
-      return res.status(401).json({ message: 'Invalid token format' });
+      return res.status(401).json({ message: 'Token must be a valid token' });
     }
 
     try {
@@ -37,7 +37,7 @@ export default class Validations {
       res.locals.auth = payload;
       next();
     } catch (err) {
-      return res.status(401).json({ message: 'Invalid token' });
+      return res.status(401).json({ message: 'Token must be a valid token' });
     }
   }
 
