@@ -1,10 +1,18 @@
-// export default class MatchesModel implements IMatchesModel {
-//   private model = SequelizeMatches;
+import { IMatches } from '../../../Interfaces/matches/IMatches';
+import { IMatchesModel } from '../../../Interfaces/matches/IMatchesModel';
+import SequelizeMatches from './SequelizeMatches';
 
-//   async findAll(): Promise<IMatches[]> {
-//     const getAll = await this.model.findAll();
-//     return getAll.map(({ id, date, teamA, teamB, scoreA, scoreB }) => ({ id, date, teamA, teamB, scoreA, scoreB }));
-//   }
+export default class MatchesModel implements IMatchesModel {
+  private model = SequelizeMatches;
 
-//     }
-// }
+  async getAllMatches(): Promise<IMatches[]> {
+    const getAll = await this.model.findAll({
+      include: [
+        { association: 'homeTeam', attributes: ['teamName'] },
+        { association: 'awayTeam', attributes: ['teamName'] },
+      ],
+    });
+
+    return getAll;
+  }
+}
