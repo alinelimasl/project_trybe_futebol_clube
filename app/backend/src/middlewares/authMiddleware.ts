@@ -11,7 +11,7 @@ export default class Validations {
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-    if (!emailRegex.test(email) || password.length < 6 || email === null) {
+    if (!emailRegex.test(email) || password.length < 6) {
       return res.status(401).json({ message: 'Invalid email or password' });
     }
 

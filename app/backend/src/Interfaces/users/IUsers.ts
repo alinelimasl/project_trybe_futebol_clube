@@ -5,8 +5,9 @@ export interface ILogin extends Identifiable{
   password: string;
 }
 
-export interface IUser extends Identifiable, ILogin {
-  name: string;
+export interface IUsers extends Identifiable, ILogin {
+  username: string;
+  role: string;
 }
 
 export type UserType = Identifiable & ILogin & {
@@ -14,4 +15,4 @@ export type UserType = Identifiable & ILogin & {
   role: string;
 };
 
-export type IUserResponse = Omit<IUser, 'password'>;
+export type IUserResponse = Omit<IUsers, 'password'>;

@@ -1,6 +1,6 @@
 import * as bcrypt from 'bcryptjs';
 import * as jwt from 'jsonwebtoken';
-import { UserType } from '../../Interfaces/users/IUsers';
+import { IUsers } from '../../Interfaces/IUsers';
 import { IUsersModel } from '../../Interfaces/users/IUsersModel';
 import { ServiceResponse } from '../../Interfaces/ServiceResponse';
 import UsersModel from '../../database/models/users/UsersModel';
@@ -12,7 +12,7 @@ type UserResponse = ServiceResponse<IUsersToken>;
 
 export default class UsersService {
   constructor(
-    private usersModel: IUsersModel<UserType> = new UsersModel(),
+    private usersModel: IUsersModel<IUsers> = new UsersModel(),
   ) {}
 
   public async usersLogin(email: string, password: string): Promise<UserResponse> {
@@ -21,6 +21,7 @@ export default class UsersService {
     if (!user) return { status: 'UNAUTHORIZED', data: { message: 'Invalid email or password' } };
 
     const isPasswordValid = await bcrypt.compareSync(password, user.password);
+
     if (!isPasswordValid) {
       return {
         status: 'UNAUTHORIZED', data: { message: 'Invalid email or password' } };
