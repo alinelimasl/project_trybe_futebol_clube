@@ -4,9 +4,7 @@ import * as chai from 'chai';
 import chaiHttp = require('chai-http');
 
 import { app } from '../app';
-import TeamsModel from '../database/models/TeamsModel';
-import { Response } from 'superagent';
-import SequelizeTeams from '../database/models/SequelizeTeams';
+import SequelizeTeams from '../database/models/teams/SequelizeTeams';
 import { teams, team } from './mocks/Teams.mock';
 
 

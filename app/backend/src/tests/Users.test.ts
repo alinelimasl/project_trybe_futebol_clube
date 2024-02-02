@@ -4,8 +4,8 @@ import SequelizeUsers from '../database/models/users/SequelizeUsers';
 // @ts-ignore
 import chaiHttp = require('chai-http');
 
-import { userWithoutPassword, users } from './mocks/Users.mock';
 import { App } from '../app';
+import { user } from './mocks/Users.mock';
 
 chai.use(chaiHttp);
 
@@ -13,31 +13,26 @@ const { expect } = chai;
 const { app } = new App();
 
 describe('Users teste', () => {
-it('Deve retornar todos os usuários', async function() {
-sinon.stub(SequelizeUsers, 'findAll').resolves(users as any);
+  it('Deve retornar um token, quando o usuário for autenticado', async function() {
+    const response = await chai.request(app)
+    .post('/login')
+    .send({ email: user.email, password: user.password });
+    
+    expect(response.status).to.be.equal(200);
+    expect(response.body).to.have.property('token');
 
-const { status, body } = await chai.request(app).get('/login');
+  });
 
-expect(status).to.be.equal(200);
-expect(body).to.be.deep.equal(users);
+  it('Deve retornar um erro, quando o usuário não for autenticado', async function() {
+    const response = await chai.request(app)
+    .post('/login')
+    .send({ email: 'invalid_email', password: 'invalid_password' });
 
-});
-it('Deve retornar um usuário por id', async function() {
-sinon.stub(SequelizeUsers, 'findOne').resolves(userWithoutPassword as any);
-
-const { status, body } = await chai.request(app).get('/login/3');
-
-expect(status).to.be.equal(200);
-expect(body).to.be.deep.equal(userWithoutPassword);
-});
-
-it('Deve retornar mensagem de erro quando usuário não for encontrado', async function() {
-sinon.stub(SequelizeUsers, 'findByPk').resolves(null);
-const { status, body } = await chai.request(app).get('/login/1');
-
-expect(status).to.equal(404);
-expect(body.message).to.equal('User not found');
-});
+    expect(response.status).to.be.equal(401);
+    expect(response.body.message).to.be.equal('Invalid email or password');
+  });
+    
+    
 
 afterEach(sinon.restore);
 });
