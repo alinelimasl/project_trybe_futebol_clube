@@ -18,4 +18,17 @@ export default class MatchesModel implements IMatchesModel {
 
     return getAll;
   }
+
+  async findById(id: string): Promise<IMatches> {
+    const matchUpdate = await this.model.findByPk(id);
+    if (!matchUpdate) {
+      throw new Error('Match not found');
+    }
+    if (matchUpdate.inProgress === false) {
+      throw new Error('Match is not in progress');
+    }
+
+    await matchUpdate.update({ inProgress: false });
+    return matchUpdate;
+  }
 }

@@ -16,4 +16,14 @@ export default class MatchesController {
 
     return res.status(200).json(serviceResponse.data);
   }
+
+  public async findById(req: Request, res: Response) {
+    const { id } = req.params;
+    const serviceResponse = await this.matchesService.findById(id);
+
+    if (serviceResponse.status === 'NOT_FOUND') {
+      return res.status(404).json(serviceResponse.data);
+    }
+    return res.status(200).json(serviceResponse.data);
+  }
 }
