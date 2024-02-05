@@ -8,11 +8,14 @@ import SequelizeTeams from '../database/models/teams/SequelizeTeams';
 import { teams, team } from './mocks/Teams.mock';
 
 
+
+
 chai.use(chaiHttp);
 
 const { expect } = chai;
 
 describe('Teams teste', () => {
+  
     it('Deve retornar todos os times', async function() {
     sinon.stub(SequelizeTeams, 'findAll').resolves(teams as any);
 
@@ -30,4 +33,5 @@ describe('Teams teste', () => {
     expect(status).to.be.equal(200);
     expect(body).to.be.deep.equal(team);
   });
+  afterEach(sinon.restore);
 });

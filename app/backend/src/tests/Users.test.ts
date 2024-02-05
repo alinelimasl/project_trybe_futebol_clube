@@ -31,6 +31,7 @@ describe('Users teste', () => {
     expect(response.status).to.be.equal(401);
     expect(response.body.message).to.be.equal('Invalid email or password');
   });
+  
     
     
 
