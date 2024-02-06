@@ -1,4 +1,4 @@
-import { ITeamsModel } from '../../Interfaces/ITeamsModel';
+import { ITeamsModel } from '../../Interfaces/teams/ITeamsModel';
 import MatchesModel from '../../database/models/matches/MatchesModel';
 import { IMatches } from '../../Interfaces/matches/IMatches';
 import { IMatchesModel } from '../../Interfaces/matches/IMatchesModel';
