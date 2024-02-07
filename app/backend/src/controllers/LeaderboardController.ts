@@ -11,8 +11,8 @@ export default class LeaderboardController {
     return res.status(200).json(serviceResponse.data);
   }
 
-  // public async getHomeTeam(req: Request, res: Response) {
-  //   const serviceResponse = await this.leaderboardService.getHomeTeam();
-  //   return res.status(200).json(serviceResponse.data);
-  // }
+  public async getAwayTeam(req: Request, res: Response) {
+    const serviceResponse = await this.leaderboardService.getAwayTeam();
+    return res.status(200).json(serviceResponse.data);
+  }
 }

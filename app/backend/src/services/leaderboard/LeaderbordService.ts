@@ -11,8 +11,8 @@ export default class LeaderboardService {
     return { status: 'SUCCESSFUL', data: leader };
   }
 
-  // public async getHomeTeam() {
-  //   const leaderHome = await this.leaderboardModel.getHomeTeam();
-  //   return { status: 'SUCCESSFUL', data: leaderHome };
-  // }
+  public async getAwayTeam() {
+    const leaderHome = await this.leaderboardModel.getAwayTeam();
+    return { status: 'SUCCESSFUL', data: leaderHome };
+  }
 }
