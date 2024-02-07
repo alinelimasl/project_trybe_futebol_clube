@@ -10,4 +10,9 @@ export default class LeaderboardService {
     const leader = await this.leaderboardModel.getLeaderboard();
     return { status: 'SUCCESSFUL', data: leader };
   }
+
+  // public async getHomeTeam() {
+  //   const leaderHome = await this.leaderboardModel.getHomeTeam();
+  //   return { status: 'SUCCESSFUL', data: leaderHome };
+  // }
 }

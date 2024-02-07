@@ -1,110 +1,172 @@
+/* eslint-disable max-lines-per-function */
+/* eslint-disable max-len */
 import { ITeams } from '../Interfaces/teams/ITeams';
 import { ILeaderboard } from '../Interfaces/leaderboard/ILeaderboard';
 import { IMatches } from '../Interfaces/matches/IMatches';
 
-function calculateTotalPoints(matches: IMatches[]): Map<number, number> {
-  const pointsMap: Map<number, number> = new Map();
-  matches.forEach((match) => {
-    if (match.homeTeamGoals > match.awayTeamGoals) {
-      pointsMap.set(match.homeTeamId, (pointsMap.get(match.homeTeamId) || 0) + 3);
-    } else if (match.homeTeamGoals < match.awayTeamGoals) {
-      pointsMap.set(match.awayTeamId, (pointsMap.get(match.awayTeamId) || 0) + 3);
-    } else {
-      pointsMap.set(match.homeTeamId, (pointsMap.get(match.homeTeamId) || 0) + 1);
-      pointsMap.set(match.awayTeamId, (pointsMap.get(match.awayTeamId) || 0) + 1);
-    }
-  });
-  return pointsMap;
-}
+function calculatePoints(matches: IMatches[], teamId: number, homeOrAway: 'Home' | 'Away'): number {
+  return matches.reduce((totalPoints, match) => {
+    const isHomeMatch = homeOrAway === 'Home' && match.homeTeamId === teamId;
+    const isAwayMatch = homeOrAway === 'Away' && match.awayTeamId === teamId;
 
-function calculateTotalGames(matches: IMatches[]): Map<number, number> {
-  const gamesMap: Map<number, number> = new Map();
-  matches.forEach((match) => {
-    gamesMap.set(match.homeTeamId, (gamesMap.get(match.homeTeamId) || 0) + 1);
-    gamesMap.set(match.awayTeamId, (gamesMap.get(match.awayTeamId) || 0) + 1);
-  });
-  return gamesMap;
-}
-
-function calculateTotalVictories(matches: IMatches[], teamId: number): number {
-  return matches.reduce((totalVictories, match) => {
-    if (match.homeTeamId === teamId && match.homeTeamGoals > match.awayTeamGoals) {
-      return totalVictories + 1;
-    } if (match.awayTeamId === teamId && match.awayTeamGoals > match.homeTeamGoals) {
-      return totalVictories + 1;
+    if (isHomeMatch || isAwayMatch) {
+      if ((isHomeMatch && match.homeTeamGoals > match.awayTeamGoals)
+          || (isAwayMatch && match.awayTeamGoals > match.homeTeamGoals)) {
+        return totalPoints + 3;
+      } if (match.homeTeamGoals === match.awayTeamGoals) {
+        return totalPoints + 1;
+      }
     }
-    return totalVictories;
+
+    return totalPoints;
   }, 0);
 }
 
-function calculateTotalDraws(matches: IMatches[], teamId: number): number {
+function calculateGames(matches: IMatches[], teamId: number, homeOrAway: 'Home' | 'Away'): number {
+  return matches.filter((match) => (homeOrAway === 'Home' && match.homeTeamId === teamId)
+|| (homeOrAway === 'Away' && match.awayTeamId === teamId)).length;
+}
+
+function calculateGoalsFavor(matches: IMatches[], teamId: number, homeOrAway: 'Home' | 'Away'): number {
+  return matches.reduce((totalGoals, match) => {
+    if ((homeOrAway === 'Home' && match.homeTeamId === teamId)
+        || (homeOrAway === 'Away' && match.awayTeamId === teamId)) {
+      return totalGoals + (homeOrAway === 'Home' ? match.homeTeamGoals : match.awayTeamGoals);
+    }
+    return totalGoals;
+  }, 0);
+}
+
+function calculateGoalsOwn(matches: IMatches[], teamId: number, homeOrAway: 'Home' | 'Away'): number {
+  return matches.reduce((totalGoals, match) => {
+    if ((homeOrAway === 'Home' && match.homeTeamId === teamId)
+        || (homeOrAway === 'Away' && match.awayTeamId === teamId)) {
+      return totalGoals + (homeOrAway === 'Home' ? match.awayTeamGoals : match.homeTeamGoals);
+    }
+    return totalGoals;
+  }, 0);
+}
+
+function calculateGoalsBalance(matches: IMatches[], teamId: number, homeOrAway: 'Home' | 'Away'): number {
+  if (homeOrAway === 'Home') {
+    return calculateGoalsFavor(matches, teamId, 'Home')
+      - calculateGoalsOwn(matches, teamId, 'Home');
+  }
+  return calculateGoalsFavor(matches, teamId, 'Away')
+    - calculateGoalsOwn(matches, teamId, 'Away');
+}
+
+function calculateEfficiency(id: number, matches: IMatches[], awayOrHome: 'Home' | 'Away' | 'Total'): string {
+  function calculate(points: number, games: number): string {
+    return ((points / (games * 3)) * 100).toFixed(2);
+  }
+  if (awayOrHome === 'Total') {
+    const totalHome = calculateGames(matches, id, 'Home');
+    const totalAway = calculateGames(matches, id, 'Away');
+    const total = totalHome + totalAway;
+    const points = calculatePoints(matches, id, 'Home') + calculatePoints(matches, id, 'Away');
+    return calculate(points, total);
+  }
+  if (awayOrHome === 'Home') {
+    const points = calculatePoints(matches, id, 'Home');
+    const games = calculateGames(matches, id, 'Home');
+    return calculate(points, games);
+  }
+  const points = calculatePoints(matches, id, 'Away');
+  const games = calculateGames(matches, id, 'Away');
+  return calculate(points, games);
+}
+
+function calculateTotalVictories(matches: IMatches[], teamId: number, homeOrAway: 'Home' | 'Away'): number {
+  return matches.reduce((totalVictories, match) => {
+    const isHomeMatch = homeOrAway === 'Home' && match.homeTeamId === teamId;
+    const isAwayMatch = homeOrAway === 'Away' && match.awayTeamId === teamId;
+
+    if ((isHomeMatch && match.homeTeamGoals > match.awayTeamGoals)
+        || (isAwayMatch && match.awayTeamGoals > match.homeTeamGoals)) {
+      return totalVictories + 1;
+    }
+
+    return totalVictories;
+  }, 0);
+}
+function calculateTotalDraws(matches: IMatches[], teamId: number, homeOrAway: 'Home' | 'Away'): number {
   return matches.reduce((totalDraws, match) => {
-    if (match.homeTeamId === teamId && match.homeTeamGoals === match.awayTeamGoals) {
-      return totalDraws + 1;
-    } if (match.awayTeamId === teamId && match.awayTeamGoals === match.homeTeamGoals) {
+    const isHomeMatch = homeOrAway === 'Home' && match.homeTeamId === teamId;
+    const isAwayMatch = homeOrAway === 'Away' && match.awayTeamId === teamId;
+
+    if (match.homeTeamGoals === match.awayTeamGoals && (isHomeMatch || isAwayMatch)) {
       return totalDraws + 1;
     }
+
     return totalDraws;
   }, 0);
 }
 
-function calculateTotalLosses(matches: IMatches[], teamId: number): number {
+function calculateTotalLosses(matches: IMatches[], teamId: number, homeOrAway: 'Home' | 'Away'): number {
   return matches.reduce((totalLosses, match) => {
-    if (match.homeTeamId === teamId && match.homeTeamGoals < match.awayTeamGoals) {
-      return totalLosses + 1;
-    } if (match.awayTeamId === teamId && match.awayTeamGoals < match.homeTeamGoals) {
+    const isHomeMatch = homeOrAway === 'Home' && match.homeTeamId === teamId;
+    const isAwayMatch = homeOrAway === 'Away' && match.awayTeamId === teamId;
+
+    if ((isHomeMatch && match.homeTeamGoals < match.awayTeamGoals)
+        || (isAwayMatch && match.awayTeamGoals < match.homeTeamGoals)) {
       return totalLosses + 1;
     }
+
     return totalLosses;
   }, 0);
 }
 
-function calculateGoalsFavor(matches: IMatches[], teamId: number): number {
-  return matches.reduce((totalGoals, match) => {
-    if (match.homeTeamId === teamId) {
-      return totalGoals + match.homeTeamGoals;
-    } if (match.awayTeamId === teamId) {
-      return totalGoals + match.awayTeamGoals;
-    }
-    return totalGoals;
-  }, 0);
-}
-
-function calculateGoalsOwn(matches: IMatches[], teamId: number): number {
-  return matches.reduce((totalGoals, match) => {
-    if (match.homeTeamId === teamId) {
-      return totalGoals + match.awayTeamGoals;
-    } if (match.awayTeamId === teamId) {
-      return totalGoals + match.homeTeamGoals;
-    }
-    return totalGoals;
-  }, 0);
-}
-
-function calculateGoalsBalance(matches: IMatches[], teamId: number): number {
-  return calculateGoalsFavor(matches, teamId) - calculateGoalsOwn(matches, teamId);
-}
-
-function calculateEfficiency(points: number, games: number): string {
-  return ((points / (games * 3)) * 100).toFixed(2);
-}
-
-export default function calculateLeaderboard(matches: IMatches[], teams: ITeams): ILeaderboard {
-  const teamMatches = matches.filter((match) => match.homeTeamId === teams.id
-  || match.awayTeamId === teams.id);
-  const teamTotalPoints = calculateTotalPoints(teamMatches).get(teams.id) || 0;
-  const teamTotalGames = calculateTotalGames(teamMatches).get(teams.id) || 0;
+function calculateHomeTeamStats(matches: IMatches[], team: ITeams): ILeaderboard {
+  const homeMatches = matches.filter((match) => match.homeTeamId === team.id);
+  const totalPoints = calculatePoints(homeMatches, team.id, 'Home');
+  const totalGames = calculateGames(homeMatches, team.id, 'Home');
+  const totalVictories = calculateTotalVictories(homeMatches, team.id, 'Home');
+  const totalDraws = calculateTotalDraws(homeMatches, team.id, 'Home');
+  const totalLosses = calculateTotalLosses(homeMatches, team.id, 'Home');
+  const goalsFavor = calculateGoalsFavor(homeMatches, team.id, 'Home');
+  const goalsOwn = calculateGoalsOwn(homeMatches, team.id, 'Home');
+  const goalsBalance = calculateGoalsBalance(homeMatches, team.id, 'Home');
+  const efficiency = calculateEfficiency(team.id, homeMatches, 'Home');
 
   return {
-    name: teams.teamName,
-    totalPoints: teamTotalPoints,
-    totalGames: teamTotalGames,
-    totalVictories: calculateTotalVictories(teamMatches, teams.id),
-    totalDraws: calculateTotalDraws(teamMatches, teams.id),
-    totalLosses: calculateTotalLosses(teamMatches, teams.id),
-    goalsFavor: calculateGoalsFavor(teamMatches, teams.id),
-    goalsOwn: calculateGoalsOwn(teamMatches, teams.id),
-    goalsBalance: calculateGoalsBalance(teamMatches, teams.id),
-    efficiency: calculateEfficiency(teamTotalPoints, teamTotalGames),
+    name: team.teamName,
+    totalPoints,
+    totalGames,
+    totalVictories,
+    totalDraws,
+    totalLosses,
+    goalsFavor,
+    goalsOwn,
+    goalsBalance,
+    efficiency,
   };
 }
+
+function calculateAwayTeamStats(matches: IMatches[], team: ITeams): ILeaderboard {
+  const awayMatches = matches.filter((match) => match.awayTeamId === team.id);
+  const totalPoints = calculatePoints(awayMatches, team.id, 'Away');
+  const totalGames = calculateGames(awayMatches, team.id, 'Away');
+  const totalVictories = calculateTotalVictories(awayMatches, team.id, 'Away');
+  const totalDraws = calculateTotalDraws(awayMatches, team.id, 'Away');
+  const totalLosses = calculateTotalLosses(awayMatches, team.id, 'Away');
+  const goalsFavor = calculateGoalsFavor(awayMatches, team.id, 'Away');
+  const goalsOwn = calculateGoalsOwn(awayMatches, team.id, 'Away');
+  const goalsBalance = calculateGoalsBalance(awayMatches, team.id, 'Away');
+  const efficiency = calculateEfficiency(team.id, awayMatches, 'Away');
+
+  return {
+    name: team.teamName,
+    totalPoints,
+    totalGames,
+    totalVictories,
+    totalDraws,
+    totalLosses,
+    goalsFavor,
+    goalsOwn,
+    goalsBalance,
+    efficiency,
+  };
+}
+
+export { calculateHomeTeamStats, calculateAwayTeamStats };

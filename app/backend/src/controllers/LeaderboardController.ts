@@ -10,4 +10,9 @@ export default class LeaderboardController {
     const serviceResponse = await this.leaderboardService.getLeaderboard();
     return res.status(200).json(serviceResponse.data);
   }
+
+  // public async getHomeTeam(req: Request, res: Response) {
+  //   const serviceResponse = await this.leaderboardService.getHomeTeam();
+  //   return res.status(200).json(serviceResponse.data);
+  // }
 }
