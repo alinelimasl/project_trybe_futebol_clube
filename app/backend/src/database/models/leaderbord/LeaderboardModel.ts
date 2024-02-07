@@ -1,5 +1,4 @@
-/* eslint-disable max-lines-per-function */
-import { calculateHomeTeamStats } from '../../../utils/board';
+import calculateHomeTeamStats from '../../../utils/boardHome';
 import { ILeaderboard } from '../../../Interfaces/leaderboard/ILeaderboard';
 import SequelizeMatches from '../matches/SequelizeMatches';
 import SequelizeTeams from '../teams/SequelizeTeams';
